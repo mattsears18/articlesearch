@@ -98,7 +98,7 @@ app.get('/articles', (req, res) => {
     res.render('articles', {
       articles: articles
     });
-  }).sort('originalname');
+  }).sort('originalname').select('originalname');
 });
 
 /**
