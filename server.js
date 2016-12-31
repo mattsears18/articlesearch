@@ -98,7 +98,7 @@ app.get('/articles', (req, res) => {
     res.render('articles', {
       articles: articles
     });
-  }).sort('originalname').select('originalname');
+  }).sort('normalizedName').select('originalname');
 });
 
 /**
@@ -110,10 +110,14 @@ app.post('/articles', upload.array('pdfs', 1000), (req, res) => {
   req.files.forEach(function(file) {
     file.pdfParser = new PDFParser(this,1);
 
-    file.pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError) );
+    file.pdfParser.on("pdfParser_dataError", errData => {
+      console.log('pdfParser Error');
+      console.error(errData.parserError)
+    });
     file.pdfParser.on("pdfParser_dataReady", pdfData => {
       file.text = file.pdfParser.getRawTextContent();
 
+      file.normalizedName = file.originalname.toLowerCase();
       file.createdAt = Date();
       var newArticle = new Article(file);
       newArticle.save(function (err, article) {
@@ -125,7 +129,6 @@ app.post('/articles', upload.array('pdfs', 1000), (req, res) => {
 
         if(counter === req.files.length) {
           console.log('FINISHED UPLADING ALL FILES!');
-          res.redirect('/');
         }
       });
     });

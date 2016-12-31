@@ -24,7 +24,7 @@ $(function() {
         var percentVal = percentComplete + '%';
         bar.width(percentVal)
         bar.html(percentVal);
-        console.log(percentVal, position, total);
+        //console.log(percentVal, position, total);
       },
       success: function() {
         var percentVal = '100%';
