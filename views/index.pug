@@ -17,7 +17,7 @@ block content
               div
                 strong Articles Uploaded: #{articleCount}
               div
-                strong Articles Processed: 0
+                strong Articles Processed: #{processedCount}
           div(class="row mt15")
             div(class="col-xs-6")
               form(method="POST" action="/articles" enctype="multipart/form-data" id="fileForm")

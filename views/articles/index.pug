@@ -10,7 +10,9 @@ block content
           table(class="table table-hover")
             tr
               th Name
+              th Processed
             each article in articles
               tr
                 td
                   a(href="/uploads/" + article.filename)=article.originalname
+                td

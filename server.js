@@ -51,14 +51,26 @@ db.once('open', function() {
  * Get index of searches
  */
 app.get('/', (req, res) => {
-  Article.collection.count(function(err, articleCount) {
-    Search.find(function (err, searches) {
-      if (err) return console.error(err);
-      res.render('index', {
-        searches: searches,
-        articleCount: articleCount
-      });
-    }).sort('-createdAt');
+  Article.collection.count((err, articleCount) => {
+
+    Article.find({text: {$exists: true}}, (err, textArticles) => {
+      var processedCount = textArticles.length;
+
+      Search.find(function (err, searches) {
+        if (err) return console.error(err);
+        res.render('index', {
+          searches: searches,
+          articleCount: articleCount,
+          processedCount: processedCount
+        });
+      }).sort('-createdAt');
+    });
+  });
+});
+
+app.get('/meh', (req, res) => {
+  Article.find({text: {$exists: true}}, (err, textArticles) => {
+    res.send(textArticles);
   });
 });
 
