@@ -1,3 +1,4 @@
+require('newrelic');
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
@@ -111,7 +112,7 @@ app.get('/articles', (req, res) => {
  * POST /articles
  * Adds new article to the database.
  */
-app.post('/articles', upload.array('pdfs', 1000), (req, res) => {
+app.post('/articles', upload.array('pdfs', 15000), (req, res) => {
   var counter = 0;
   req.files.forEach(function(file) {
     file.normalizedName = file.originalname.toLowerCase();
