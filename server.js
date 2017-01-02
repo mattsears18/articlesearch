@@ -104,7 +104,7 @@ app.get('/articles', (req, res) => {
     res.render('articles', {
       articles: articles
     });
-  }).sort('normalizedName').select('originalname');
+  }).sort('normalizedName').select('originalname filename');
 });
 
 /**
