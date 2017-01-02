@@ -5,7 +5,6 @@ var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 
 var multer = require('multer');
-var PDFParser = require("pdf2json");
 
 var upload = multer({
   dest: __dirname + '/public/uploads/',
@@ -53,7 +52,7 @@ db.once('open', function() {
 app.get('/', (req, res) => {
   Article.collection.count((err, articleCount) => {
 
-    Article.find({text: {$exists: true}}, (err, textArticles) => {
+    Article.find({processed: true}, (err, textArticles) => {
       var processedCount = textArticles.length;
 
       Search.find(function (err, searches) {
@@ -64,13 +63,7 @@ app.get('/', (req, res) => {
           processedCount: processedCount
         });
       }).sort('-createdAt');
-    });
-  });
-});
-
-app.get('/meh', (req, res) => {
-  Article.find({text: {$exists: true}}, (err, textArticles) => {
-    res.send(textArticles);
+    }).select('_id');
   });
 });
 
