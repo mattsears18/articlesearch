@@ -36,6 +36,7 @@ var mongodbUri = process.env.MONGODB_URI || 'mongodb://heroku_3zwvsqsq:446onvqsj
 
 mongoose.connect(mongodbUri, options);
 var db = mongoose.connection;
+mongoose.Promise = global.Promise;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
