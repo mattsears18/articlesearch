@@ -36,7 +36,7 @@ var mongodbUri = process.env.MONGODB_URI || 'mongodb://heroku_3zwvsqsq:446onvqsj
 
 mongoose.connect(mongodbUri, options);
 var db = mongoose.connection;
-mongoose.Promise = global.Promise;
+mongoose.Promise = require('bluebird');
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
@@ -109,31 +109,20 @@ app.get('/articles', (req, res) => {
 app.post('/articles', upload.array('pdfs', 1000), (req, res) => {
   var counter = 0;
   req.files.forEach(function(file) {
-    file.pdfParser = new PDFParser(this,1);
+    file.normalizedName = file.originalname.toLowerCase();
+    file.createdAt = Date();
+    var newArticle = new Article(file);
+    newArticle.save(function (err, article) {
+      if (err) res.send(err);
 
-    file.pdfParser.on("pdfParser_dataError", errData => {
-      console.log('pdfParser Error');
-      console.error(errData.parserError)
+      console.log(article.originalname);
+      counter++;
+      console.log(counter + ' : ' + req.files.length);
+
+      if(counter === req.files.length) {
+        console.log('FINISHED UPLADING ALL FILES!');
+        res.send('Success');
+      }
     });
-    file.pdfParser.on("pdfParser_dataReady", pdfData => {
-      file.text = file.pdfParser.getRawTextContent();
-
-      file.normalizedName = file.originalname.toLowerCase();
-      file.createdAt = Date();
-      var newArticle = new Article(file);
-      newArticle.save(function (err, article) {
-        if (err) res.send(err);
-
-        console.log(article.originalname);
-        counter++;
-        console.log(counter + ' : ' + req.files.length);
-
-        if(counter === req.files.length) {
-          console.log('FINISHED UPLADING ALL FILES!');
-        }
-      });
-    });
-
-    file.pdfParser.loadPDF(__dirname + "/public/uploads/" + file.filename);
   });
 });

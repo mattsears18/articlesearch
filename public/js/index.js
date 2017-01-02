@@ -34,6 +34,7 @@ $(function() {
   	complete: function(xhr) {
   		status.html(xhr.responseText);
       progress.slideUp();
+      window.location.href = '/';
   	}
   });
 });
