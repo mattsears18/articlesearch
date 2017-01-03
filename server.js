@@ -152,6 +152,7 @@ function processArticles(err, articles) {
         var filePath = path.join(__dirname + "/public/uploads/" + article.filename);
         var pdf = new pdftotext(filePath);
 
+
         var text = pdf.getTextSync();
         article.text = text;
         article.processed = true;
