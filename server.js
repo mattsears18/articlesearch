@@ -1,4 +1,4 @@
-require('newrelic');
+'use strict'
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
@@ -28,19 +28,19 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('public'));
 app.set('view engine', 'pug');
 
-var options = { server: { socketOptions: { keepAlive: 3000000, connectTimeoutMS: 300000 } },
-                replset: { socketOptions: { keepAlive: 3000000, connectTimeoutMS : 300000 } } };
+var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
+                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };
 
 //var mongodbUri = process.env.MONGODB_URI || 'localhost/test';
 var mongodbUri = process.env.MONGODB_URI || 'mongodb://heroku_3zwvsqsq:446onvqsjjanf81skjhmf51it4@ds149278.mlab.com:49278/heroku_3zwvsqsq';
 
 mongoose.connect(mongodbUri, options);
-var db = mongoose.connection;
+app.db = mongoose.connection;
 mongoose.Promise = require('bluebird');
 
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
-  port = process.env.PORT || 3000;
+app.db.on('error', console.error.bind(console, 'connection error:'));
+app.db.once('open', function() {
+  var port = process.env.PORT || 3000;
   app.listen(port, () => {
     console.log('listening on ' + port);
   });
@@ -64,7 +64,7 @@ app.get('/', (req, res) => {
           processedCount: processedCount
         });
       }).sort('-createdAt');
-    }).select('_id');
+    }).select('originalname');
   });
 });
 
@@ -126,7 +126,7 @@ app.post('/articles', upload.array('pdfs', 15000), (req, res) => {
       console.log(counter + ' : ' + req.files.length);
 
       if(counter === req.files.length) {
-        console.log('FINISHED UPLADING ALL FILES!');
+        console.log('FINISHED UPLOADING ALL FILES!');
         res.send('Success');
       }
     });

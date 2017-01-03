@@ -1,3 +1,4 @@
+'use strict'
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var PDFParser = require("pdf2json");
@@ -13,10 +14,10 @@ var articleSchema = new Schema({
   createdAt: Date
 });
 
+var pdfParser = new PDFParser();
+
 articleSchema.post('save', function(article) {
   if(!article.processed) {
-    var pdfParser = new PDFParser(this,1);
-
     pdfParser.on("pdfParser_dataError", errData => {
       console.log('pdfParser Error');
       console.error(errData);
@@ -27,7 +28,9 @@ articleSchema.post('save', function(article) {
       article.processed = true;
 
       article.save(function (err, article) {
-        if (err) res.send(err);
+        //if (err) res.send(err)
+          //console.log(err);
+
         console.log('Text parsed: ' + article.originalname);
       });
     });
