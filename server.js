@@ -140,39 +140,36 @@ app.post('/articles', upload.array('pdfs', 15000), (req, res) => {
 * Get index of searches
 */
 app.get('/processArticles', (req, res) => {
-  console.log(processArticles());
+  processArticles();
 });
 
 function processArticles(err, articles) {
   Article.find({ processed: { $exists: false } }, (err, articles) => {
-    articles.forEach((article) => {
+
+    for (var i=0; i < articles.length; i++) {
+      var article = articles[i];
       if(!article.processed) {
         var filePath = path.join(__dirname + "/public/uploads/" + article.filename);
         var pdf = new pdftotext(filePath);
 
-        pdf.getText(function(err, text, cmd) {
+        var text = pdf.getTextSync();
+        article.text = text;
+        article.processed = true;
+
+        article.save(function (err, article) {
           if (err) {
-            console.error(err);
-          } else {
-            article.text = text;
-            article.processed = true;
-
-            article.save(function (err, article) {
-              if (err) {
-                console.log(err);
-                res.send(err);
-              }
-
-              console.log('Text parsed: ' + article.originalname);
-            });
+            console.log(err);
+            res.send(err);
           }
+
+          console.log('Text parsed: ' + article.originalname);
         });
       }
-    });
+    }
 
     Article.find({ processed: { $exists: false } }, (err, articles) => {
       if(articles.length > 1) {
-        processArticles();
+        //processArticles();
       }
     }).select('filename');
   }).select('originalname filename');
