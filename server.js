@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var path = require('path');
 var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
+var pdftotext = require('pdftotextjs');
 
 var multer = require('multer');
 
@@ -28,8 +29,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('public'));
 app.set('view engine', 'pug');
 
-var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
-                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };
+var options = { server: { socketOptions: { keepAlive: 3700000, connectTimeoutMS: 3600000 } },
+                replset: { socketOptions: { keepAlive: 3700000, connectTimeoutMS : 3600000 } } };
 
 //var mongodbUri = process.env.MONGODB_URI || 'localhost/test';
 var mongodbUri = process.env.MONGODB_URI || 'mongodb://heroku_3zwvsqsq:446onvqsjjanf81skjhmf51it4@ds149278.mlab.com:49278/heroku_3zwvsqsq';
@@ -132,3 +133,47 @@ app.post('/articles', upload.array('pdfs', 15000), (req, res) => {
     });
   });
 });
+
+
+/**
+* GET /
+* Get index of searches
+*/
+app.get('/processArticles', (req, res) => {
+  console.log(processArticles());
+});
+
+function processArticles(err, articles) {
+  Article.find({ processed: { $exists: false } }, (err, articles) => {
+    articles.forEach((article) => {
+      if(!article.processed) {
+        var filePath = path.join(__dirname + "/public/uploads/" + article.filename);
+        var pdf = new pdftotext(filePath);
+
+        pdf.getText(function(err, text, cmd) {
+          if (err) {
+            console.error(err);
+          } else {
+            article.text = text;
+            article.processed = true;
+
+            article.save(function (err, article) {
+              if (err) {
+                console.log(err);
+                res.send(err);
+              }
+
+              console.log('Text parsed: ' + article.originalname);
+            });
+          }
+        });
+      }
+    });
+
+    Article.find({ processed: { $exists: false } }, (err, articles) => {
+      if(articles.length > 1) {
+        processArticles();
+      }
+    }).select('filename');
+  }).select('originalname filename');
+}

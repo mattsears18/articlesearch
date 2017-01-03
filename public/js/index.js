@@ -34,6 +34,7 @@ $(function() {
   	complete: function(xhr) {
   		status.html(xhr.responseText);
       progress.slideUp();
+      $.get('/processArticles');
       window.location.href = '/';
   	}
   });
