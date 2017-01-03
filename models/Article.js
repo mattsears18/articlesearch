@@ -2,6 +2,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var PDFParser = require("pdf2json");
+var path = require('path');
+var extract = require('pdf-text-extract');
 
 var articleSchema = new Schema({
   originalname: String,
@@ -18,24 +20,26 @@ var pdfParser = new PDFParser();
 
 articleSchema.post('save', function(article) {
   if(!article.processed) {
-    pdfParser.on("pdfParser_dataError", errData => {
-      console.log('pdfParser Error');
-      console.error(errData);
-    });
+    var filePath = path.join(__dirname + "/../public/uploads/" + article.filename);
 
-    pdfParser.on("pdfParser_dataReady", pdfData => {
-      article.text = pdfParser.getRawTextContent();
+    extract(filePath, { splitPages: false }, function (err, text) {
+      if (err) {
+        console.dir(err)
+        return
+      }
+
+      article.text = text;
       article.processed = true;
 
       article.save(function (err, article) {
-        //if (err) res.send(err)
-          //console.log(err);
+        if (err) {
+          console.log(err);
+          res.send(err);
+        }
 
         console.log('Text parsed: ' + article.originalname);
       });
     });
-
-    pdfParser.loadPDF(__dirname + "/../public/uploads/" + article.filename);
   }
 });
 
