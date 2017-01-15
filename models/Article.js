@@ -13,4 +13,6 @@ var articleSchema = new Schema({
   createdAt: Date
 });
 
+articleSchema.index({ normalizedName: 1 });
+
 module.exports = mongoose.model('Article', articleSchema);

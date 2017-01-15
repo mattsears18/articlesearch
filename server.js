@@ -36,11 +36,11 @@ var options = { server: { socketOptions: { keepAlive: 3700000, connectTimeoutMS:
 var mongodbUri = process.env.MONGODB_URI || 'mongodb://heroku_3zwvsqsq:446onvqsjjanf81skjhmf51it4@ds149278.mlab.com:49278/heroku_3zwvsqsq';
 
 mongoose.connect(mongodbUri, options);
-app.db = mongoose.connection;
+var db = mongoose.connection;
 mongoose.Promise = require('bluebird');
 
-app.db.on('error', console.error.bind(console, 'connection error:'));
-app.db.once('open', function() {
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
   var port = process.env.PORT || 3000;
   app.listen(port, () => {
     console.log('listening on ' + port);
@@ -170,7 +170,7 @@ function processArticles(err, articles) {
 
     Article.find({ processed: { $exists: false } }, (err, articles) => {
       if(articles.length > 1) {
-        //processArticles();
+        processArticles();
       }
     }).select('filename');
   }).select('originalname filename');
