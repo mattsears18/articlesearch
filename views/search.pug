@@ -6,8 +6,12 @@ block content
     div
       table(class="table table-striped table-hover")
         tr
+          th File
           th Articles (#{search.articles.length})
         each article in search.articles
           tr
             td
-              a(href="/uploads/" + article.filename target="_blank")=article.originalname
+              a(href="/uploads/" + article.filename target="_blank")
+                span(class="glyphicon glyphicon-file")
+            td
+              a(href="/articles/" + article._id)=article.originalname
