@@ -5,6 +5,7 @@ var path = require('path');
 var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var pdftotext = require('pdftotextjs');
+var fs = require('fs');
 
 var multer = require('multer');
 
@@ -221,21 +222,24 @@ function processArticles(err, articles) {
       var article = articles[i];
       if(!article.processed) {
         var filePath = path.join(__dirname + "/public/uploads/" + article.filename);
-        var pdf = new pdftotext(filePath);
 
+        if (fs.existsSync(filePath)) {
+          var pdf = new pdftotext(filePath);
+          var text = pdf.getTextSync();
+          article.text = text;
+          article.processed = true;
 
-        var text = pdf.getTextSync();
-        article.text = text;
-        article.processed = true;
+          article.save(function (err, article) {
+            if (err) {
+              console.log(err);
+              res.send(err);
+            }
 
-        article.save(function (err, article) {
-          if (err) {
-            console.log(err);
-            res.send(err);
-          }
-
-          console.log('Text parsed: ' + article.originalname);
-        });
+            console.log('Text parsed: ' + article.originalname);
+          });
+        } else {
+          console.log('File does not exist');
+        }
       }
     }
 
