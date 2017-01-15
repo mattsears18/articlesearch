@@ -9,10 +9,24 @@ block content
         div
           table(class="table table-hover")
             tr
+              th File
               th Name
               th Processed
+              th
+                span(class="glyphicon glyphicon-trash")
             each article in articles
               tr
+                td(class="text-center")
+                  a(href="/uploads/" + article.filename)
+                    span(class="glyphicon glyphicon-file")
                 td
-                  a(href="/uploads/" + article.filename)=article.originalname
-                td
+                  a(href="/articles/" + article._id)=article.originalname
+                td(class="text-center")
+                  if article.processed
+                    a(href="/articles/" + article._id)
+                      span(class="glyphicon glyphicon-ok")
+                  else
+                    shit
+                td(class="text-center")
+                  a(href="/articles/delete/" + article._id)
+                    div(class="glyphicon glyphicon-trash text-danger")

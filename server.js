@@ -157,7 +157,27 @@ app.get('/articles', (req, res) => {
     res.render('articles', {
       articles: articles
     });
-  }).sort('normalizedName').select('originalname filename');
+  }).sort('normalizedName').select('originalname filename processed');
+});
+
+/**
+ * GET /articles/:id
+ * Get an article
+ */
+app.get('/articles/:id', (req, res) => {
+  Article.findById(req.params.id, function(err, article) {
+    res.render('articles/article', { article: article });
+  });
+});
+
+/**
+ * GET /articles/delete/:id
+ * Delete and article
+ */
+app.get('/articles/delete/:id', (req, res) => {
+  Article.findByIdAndRemove(req.params.id, function(err, article) {
+    res.redirect('/articles');
+  });
 });
 
 /**

@@ -37,6 +37,7 @@ block content
               th(class="text-center") Results
               th Datetime
               th
+                span(class="glyphicon glyphicon-trash")
             each search in searches
               tr
                 td
@@ -47,4 +48,4 @@ block content
                   a(href="/searches/" + search._id)=search.createdAt
                 td
                   a(href="/searches/delete/" + search._id)
-                    span(class="glyphicon glyphicon-remove text-danger")
+                    span(class="glyphicon glyphicon-trash text-danger")
