@@ -79,6 +79,16 @@ app.get('/searches/:id', (req, res) => {
   }).populate('articles');
 });
 
+/**
+ * GET /searches/delete/:id
+ * Get index of searches
+ */
+app.get('/searches/delete/:id', (req, res) => {
+  Search.findByIdAndRemove(req.params.id, function(err, search) {
+    res.redirect('/');
+  });
+});
+
 
 
 
