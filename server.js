@@ -79,6 +79,21 @@ app.get('/searches/:id', (req, res) => {
   }).populate('articles');
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * POST /searches
  * Adds new search to the database.
@@ -88,13 +103,39 @@ app.post('/searches', (req, res) => {
   data.createdAt = Date();
 
   var newSearch = new Search(data);
-  newSearch.save(function (err, quote) {
-    if (err) console.log(err);
-    console.log('saved to databse');
 
-    res.redirect('/');
-  });
+  console.log(data);
+
+
+
+  Article.find({text: new RegExp("\\b" + newSearch.term + "\\b", 'i')}, (err, articles) => {
+    console.log(articles);
+
+    newSearch.articles = articles;
+
+    newSearch.save(function (err, quote) {
+      if (err) console.log(err);
+      console.log('search saved to databse');
+
+      res.redirect('/');
+    });
+
+  }).select('text').sort('normalizedName');
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
 * GET /
