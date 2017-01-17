@@ -9,7 +9,5 @@
 
 body { margin-bottom: 50px; }
 
-
-.navbar-header button.navbar-brand {float:left;}
-.navbar-header ul {float:right;margin:0;padding:0;}
-ul {list-style:none;}
+.text-gray { color: #999; }
+.text-gray a { color: #999; }
