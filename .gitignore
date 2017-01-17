@@ -49,3 +49,5 @@ jspm_packages
 public/uploads/
 
 node_modules/
+
+.env
