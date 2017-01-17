@@ -35,6 +35,8 @@ var options = { server: { socketOptions: { keepAlive: 3700000, connectTimeoutMS:
 
 var mongodbUri = process.env.MONGODB_URI;
 
+console.log(process.env.MONGODB_URI);
+
 mongoose.connect(mongodbUri, options);
 var db = mongoose.connection;
 mongoose.Promise = require('bluebird');
