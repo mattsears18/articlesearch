@@ -34,6 +34,4 @@ Then navigate to http://localhost:5000
 
 License
 -------
-License
-
 Article Search is released under the MIT License. See the bundled [LICENSE](https://github.com/mattsears18/articlesearch/blob/master/LICENSE) file for details.
