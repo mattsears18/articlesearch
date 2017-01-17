@@ -33,8 +33,7 @@ app.set('view engine', 'pug');
 var options = { server: { socketOptions: { keepAlive: 3700000, connectTimeoutMS: 3600000 } },
                 replset: { socketOptions: { keepAlive: 3700000, connectTimeoutMS : 3600000 } } };
 
-//var mongodbUri = process.env.MONGODB_URI || 'localhost/test';
-var mongodbUri = process.env.MONGODB_URI || 'mongodb://heroku_3zwvsqsq:446onvqsjjanf81skjhmf51it4@ds149278.mlab.com:49278/heroku_3zwvsqsq';
+var mongodbUri = process.env.MONGODB_URI;
 
 mongoose.connect(mongodbUri, options);
 var db = mongoose.connection;
@@ -90,21 +89,6 @@ app.get('/searches/delete/:id', (req, res) => {
   });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
  * POST /searches
  * Adds new search to the database.
@@ -114,10 +98,6 @@ app.post('/searches', (req, res) => {
   data.createdAt = Date();
 
   var newSearch = new Search(data);
-
-  console.log(data);
-
-
 
   Article.find({text: new RegExp("\\b" + newSearch.term + "\\b", 'i')}, (err, articles) => {
     console.log(articles);
@@ -133,20 +113,6 @@ app.post('/searches', (req, res) => {
 
   }).select('text').sort('normalizedName');
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /**
 * GET /
@@ -205,7 +171,6 @@ app.post('/articles', upload.array('pdfs', 15000), (req, res) => {
     });
   });
 });
-
 
 /**
 * GET /
