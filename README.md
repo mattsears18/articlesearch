@@ -31,3 +31,9 @@ Do installation as above, then:
 You will need `pdftotext` which can be obtained by installing [xPdf](http://www.foolabs.com/xpdf/) locally.
 
 Then navigate to http://localhost:5000
+
+License
+-------
+License
+
+Article Search is released under the MIT License. See the bundled [LICENSE](https://github.com/mattsears18/articlesearch/blob/master/LICENSE) file for details.
