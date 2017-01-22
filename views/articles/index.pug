@@ -17,7 +17,7 @@ block content
             each article in articles
               tr
                 td(class="text-center")
-                  a(href="/uploads/" + article.filename)
+                  a(href=article.filepath)
                     span(class="glyphicon glyphicon-file")
                 td
                   a(href="/articles/" + article._id)=article.originalname

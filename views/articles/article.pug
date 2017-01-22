@@ -3,7 +3,7 @@ extends ../layout
 block content
   div(class="container")
     h2=article.originalname
-      a(href="/uploads/" + article.filename)
+      a(href=article.filepath)
         span(class="ml10 glyphicon glyphicon-file")
 
     div=article.text

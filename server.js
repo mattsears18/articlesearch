@@ -6,6 +6,7 @@ var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 var pdftotext = require('pdftotextjs');
 var fs = require('fs');
+var csv = require('csvtojson');
 
 var multer = require('multer');
 
@@ -34,8 +35,6 @@ var options = { server: { socketOptions: { keepAlive: 3700000, connectTimeoutMS:
                 replset: { socketOptions: { keepAlive: 3700000, connectTimeoutMS : 3600000 } } };
 
 var mongodbUri = process.env.MONGODB_URI;
-
-console.log(process.env.MONGODB_URI);
 
 mongoose.connect(mongodbUri, options);
 var db = mongoose.connection;
@@ -126,7 +125,7 @@ app.get('/articles', (req, res) => {
     res.render('articles', {
       articles: articles
     });
-  }).sort('normalizedName').select('originalname filename processed');
+  }).sort('normalizedName').select('originalname filename processed uri');
 });
 
 /**
@@ -154,24 +153,38 @@ app.get('/articles/delete/:id', (req, res) => {
  * Adds new article to the database.
  */
 app.post('/articles', upload.array('pdfs', 15000), (req, res) => {
-  var counter = 0;
-  req.files.forEach(function(file) {
-    file.normalizedName = file.originalname.toLowerCase();
-    file.createdAt = Date();
-    var newArticle = new Article(file);
-    newArticle.save(function (err, article) {
-      if (err) res.send(err);
+  makeArticles(req.files);
+  res.redirect('/');
+});
 
-      console.log(article.originalname);
-      counter++;
-      console.log(counter + ' : ' + req.files.length);
+/**
+ * GET /csv
+ * Get an article
+ */
+app.get('/csv', (req, res) => {
+  res.render('csv');
+});
 
-      if(counter === req.files.length) {
-        console.log('FINISHED UPLOADING ALL FILES!');
-        res.send('Success');
-      }
-    });
-  });
+var uploadCsv = multer({
+  dest: __dirname + '/public/uploads/'
+});
+
+/**
+ * POST /csv
+ * Adds new articles to the database based upon CSV file.
+ */
+app.post('/csv', uploadCsv.array('csv', 1), (req, res) => {
+  var file = req.files[0];
+
+  csv()
+  .fromFile(__dirname + '/public/uploads/' + file.filename)
+  .on('json', (jsonObj) => {
+    console.log(jsonObj);
+  })
+  .on('end_parsed', (jsonObjs) => {
+    makeArticles(jsonObjs);
+    res.redirect('/');
+  })
 });
 
 /**
@@ -216,4 +229,24 @@ function processArticles(err, articles) {
       }
     }).select('filename');
   }).select('originalname filename');
+}
+
+function makeArticles(files) {
+  var counter = 0;
+  files.forEach(function(file) {
+    file.normalizedName = file.originalname.toLowerCase();
+    file.createdAt = Date();
+    var newArticle = new Article(file);
+    newArticle.save(function (err, article) {
+      if (err) res.send(err);
+
+      console.log(article.originalname);
+      counter++;
+      console.log(counter + ' : ' + files.length);
+
+      if(counter === files.length) {
+        console.log('FINISHED UPLOADING ALL FILES!');
+      }
+    });
+  });
 }
